@@ -1,4 +1,5 @@
-[ { "BlackBox"    :
+[
+  { "BlackBox"    :
     { "name"      : "Assert.assumeProperty"
     , "templateD" : "// assumeProperty begin
 `ifdef FORMAL
@@ -18,11 +19,13 @@ assign ~RESULT = ~ARG[1];
 // assertProperty end"
     }
   },
+
   { "BlackBox"    :
     { "name"      : "Assert.|->"
     , "templateE" : "(~ARG[0] |-> ~ARG[1])"
     }
   },
+
   { "BlackBox"    :
     { "name"      : "Assert.initialAssume"
     , "templateD" : "// initialAssume begin

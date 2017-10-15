@@ -19,6 +19,11 @@ module Assert
     , assumeProperty  -- :: Property dom -> Signal dom a -> Signal dom a
     , assertProperty  -- :: Property dom -> Signal dom a -> Signal dom a
 
+    -- ** Behavioral assertions
+    , assert   -- :: Bool -> a -> a
+    , assume   -- :: Bool -> a -> a
+    , restrict -- :: Bool -> a -> a
+
     -- * Utilities
     , getReset        -- :: Reset dom sync -> Signal dom Bool
   ) where
@@ -115,6 +120,20 @@ assumeProperty
 assumeProperty = \_ x -> x
 {-# NOINLINE assumeProperty #-}
 
+-- Behavioral assertions
+
+restrict :: Bool -> a -> a
+restrict = \_ a -> a
+{-# NOINLINE restrict #-}
+
+assume :: Bool -> a -> a
+assume = \_ a -> a
+{-# NOINLINE assume #-}
+
+assert :: Bool -> a -> a
+assert = \_ a -> a
+{-# NOINLINE assert #-}
+
 --------------------------------------------------------------------------------
 -- Implication
 
@@ -185,41 +204,3 @@ getReset
 getReset (Async rst) = rst
 getReset (Sync rst)  = rst
 {-# INLINEABLE getReset #-}
-
-{--
--- | Assert a SystemVerilog(-ish) property over a given @'Signal'@, returning
--- another @'Signal'@.
---
--- During both simulation and synthesis, @'assertProperty' b v@ is equivalent to
--- @v@. However, during verification (with @yosys-smtbmc@ or @symbiyosys@), this
--- asserts that the given @'Bool'@ @'Signal'@ always holds @'True'@.
-assertProperty
-  :: Signal dom Bool
-  -- ^ The assertion to check. This is a stateful @'Signal'@ which is assumed to
-  -- be some property to check over a given circuit.
-  -> Signal dom a
-  -- ^ Input @'Signal'@. This value is simply returned.
-  -> Signal dom a
-  -- ^ Output @'Signal'@. Identical to the input @'Signal'@.
-assertProperty = \_ x -> x
-{-# NOINLINE assertProperty #-}
-
--- | Assume a SystemVerilog(-ish) property for the initial clock cycle, over
--- a given @'Signal'@, returning another @'Signal'@.
---
--- During both simulation and synthesis, @'initialAssume' b v@ is equivalent to
--- @v@. However, during verification (with @yosys-smtbmc@ or @symbiyosys@), this
--- introduces the necessary assumption that the @'Bool'@ holds true on the
--- initial clock cycle; i.e. it tells that the given @'Bool'@ @'Signal'@ holds
--- @'True'@ the verification tool to only consider SMT traces where this case is
--- true.
-initialAssume
-  :: Signal dom Bool
-  -- ^ Signal to assume true on the initial clock cycle.
-  -> Signal dom a
-  -- ^ Input @'Signal'@. This value is simply returned.
-  -> Signal dom a
-  -- ^ Output @'Signal'@. Identical to the input @'Signal'@.
-initialAssume = \_ x -> x
-{-# NOINLINE initialAssume #-}
---}
