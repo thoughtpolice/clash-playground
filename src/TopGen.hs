@@ -22,7 +22,7 @@ import           Language.Haskell.TH.Syntax
 
 -- clash
 import           Clash.NamedTypes            ((:::))
-import           Clash.Annotations.TopEntity
+import           Clash.Annotations.TopEntity (PortName(..), TopEntity(..))
 
 --
 -- utilities
@@ -38,7 +38,7 @@ pattern NamedTy con nam <-
 pattern ArrowTy :: Type -> Type -> Type
 pattern ArrowTy a b = AppT (AppT ArrowT a) b
 
--- orphans
+-- orphans. TODO FIXME: move these upstream
 deriving instance Lift PortName
 deriving instance Lift TopEntity
 
