@@ -1,0 +1,204 @@
+* A Clash/FPGA playground using Nix
+
+This repository contains a basic skeleton for doing FPGA development and
+testing, using [[http://clash-lang.org][Clash]], [[http://clifford.at/yosys][Yosys]], [[http://clifford.at/icestorm][IceStorm]], and more tools. These are all wrapped up
+and provided using the [[https://nixos.org][Nix]] package manager, meaning this setup /should/ work on
+any Linux distribution.
+
+** What this repository does
+
+It gives you a fairly painless and one-shot way of setting up an environment for
+Clash development, along with a lot of other helpful tools.
+
+** What this repository contains
+
+The Nix environment used here installs several tools for FPGA and Haskell
+development in general:
+
+  - Synthesis tools:
+    - *Clash* 0.99 (soon-to-be 1.0.0)
+    - *Yosys*
+
+  - Haskell libraries and tools:
+    - lens
+    - shake
+    - tasty, hedgehog, hunit
+    - ghcid
+
+  - Chip/hardware tools:
+    - *IceStorm* and *arachne-pnr*
+
+  - Verification & testing tools:
+    - *Icarus Verilog* and *GHDL* (LLVM version)
+    - *[[https://github.com/cliffordwolf/symbiyosys][SymbiYosys]]*, a tool for driving ~yosys-smtbmc~ based verification flows
+      in an automated manner.
+    - A few SMT solvers including Yices (now GPLv3!) and Z3 (MIT) to go with
+      SymbiYosys.
+
+** How to use this repository
+
+#+BEGIN_QUOTE
+*NOTE*: This repository has only been tested on Linux! While Nix supports macOS
+systems, and in theory this repository should work, macOS High Sierra seems to
+have several issues with Nix at this time of writing, and I *CAN NOT* provide
+any support for High Sierra users (as I do not have a Mac).
+
+If you are a Nix-on-macOS user who is brave and would like to try supporting
+this repository, please submit any patches if they are necessary. In the future
+I /would/ like to support macOS users, using a binary cache.
+#+END_QUOTE
+
+First off, you must...
+
+*** Install the Nix package manager
+
+The first thing you must do *no matter what Linux distribution you are running*
+is to [[https://nixos.org/nix/download.html][install the Nix package manager]]. However, it's luckily very easy to do
+this. A bash script on the provided https://nixos.org homepage can do it for
+you.
+
+When this installation is complete, you should have a ~/nix~ directory on the
+root ~/~ dir of your machine, and you should be able to execute:
+
+#+BEGIN_SRC
+$ nix-env --version
+nix-env (Nix) 1.11.14
+#+END_SRC
+
+After this is done, you can...
+
+*** Run ~nix-shell~ and get some coffee
+
+Now, clone the Git repository and simply execute ~nix-shell~ inside the root:
+
+#+BEGIN_SRC
+$ git clone https://github.com/thoughtpolice/clash-playground
+$ cd clash-playground
+$ nix-shell
+#+END_SRC
+
+*NOTE*: if you have a bunch of spare cores available, you can speed this up! For
+example, using the ~ncpus~ utility, available in most systems already:
+
+#+BEGIN_SRC
+$ nix-shell -j$(ncpus)
+#+END_SRC
+
+This will download in parallel, but it will also compile many things in
+parallel, so use it with as many cores as you can spare to help speed it up.
+
+Once this is complete, you will be dropped into a new Bash shell environment,
+with a green ~PS1~ prompt, that looks like the following:
+
+#+BEGIN_SRC
+[nix-shell:~/src/clash-playground]$
+#+END_SRC
+
+In order to make sure everything works -- try invoking ~clashi~ and testing it:
+
+#+BEGIN_SRC
+[nix-shell:~/src/clash-playground]$ clashi
+CLaSHi, version 0.99 (using clash-lib, version 0.99):
+http://www.clash-lang.org/  :? for help
+Clash.Prelude> let x = register (0 :: Unsigned 32) (x + 1)
+Clash.Prelude> sampleN 32 x
+[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+Clash.Prelude>
+#+END_SRC
+
+Hurrah! And with that done, you can now...
+
+*** Play around
+
+Go ahead and look under ~src/~ for more Clash examples and some notes there!
+
+** Source map
+
+  - ~release.nix~ -- a file describing /all/ of the necessary dependencies and
+    build tools for this project.
+
+  - ~shell.nix~ -- a file that is used for ~nix-shell~, so it knows what
+    environment to put the user inside of.. It simply exports the
+    ~shell~ environment from ~release.nix~ and is otherwise empty.
+
+  - ~nix/~: contains Nix-related expressions and package code. It mainly
+    provides a customized set of Haskell/Clash packages that are very recent
+    versions.
+
+  - ~src/~: All Clash and Verilog source code.
+
+** Some extra goodies
+
+The Haskell packages are automatically indexed into a Hoogle database, and the
+~hoogle~ commands are available to you. But it's easier and even nicer to use
+them with ~ghci~. Simply put the following in your ~$HOME/.ghc/ghci.conf~:
+
+#+BEGIN_SRC
+:def hoogle \s -> return $ ":! hoogle search -l --count=15 \"" ++ s ++ "\""
+:def doc \s -> return $ ":! hoogle search -l --info \"" ++ s ++ "\""
+#+END_SRC
+
+Now, you can do things like search for module documentation, for example, for
+~Clash.Prelude~:
+
+#+BEGIN_SRC
+[nix-shell:~/src/clash-playground/nix/haskell]$ ghci
+GHCi, version 8.2.1: http://www.haskell.org/ghc/  :? for help
+Loaded GHCi configuration from /home/austin/.ghc/ghci.conf
+Prelude> :hoogle Clash.Prelude
+module Clash.Explicit.Prelude -- file:///nix/store/dkwx3sy2wlc9lgz77gj49pcdgz87i13q-clash-prelude-0.99-doc/share/doc/html/Clash-Explicit-Prelude.html
+module Clash.Prelude -- file:///nix/store/dkwx3sy2wlc9lgz77gj49pcdgz87i13q-clash-prelude-0.99-doc/share/doc/html/Clash-Prelude.html
+Prelude>
+#+END_SRC
+
+Note that any *new* packages you install will automatically get indexed, but
+every addition means the index must be rebuilt! So it adds a little build time
+on top of whatever packages you need.
+
+** How to hack on this repository itself
+
+What you need to hack this repository is two things, mostly: ~nix-prefetch-git~
+and ~cabal2nix~. *Both of these tools are available in the* ~nix-shell~
+*environment for you*.
+
+The two most common things to do are "upgrade Haskell packages" and "upgrade Nixpkgs".
+
+*** Upgrading nixpkgs
+
+This is easy: simply run ~nix-shell~, then use ~nix-prefetch-git~ to update the
+~nixpkgs.json~ file under the ~nix/~ directory:
+
+#+BEGIN_SRC
+[nix-shell:~/src/clash-playground]$ nix-prefetch-git https://github.com/nixos/nixpkgs.git > nix/nixpkgs.json
+#+END_SRC
+
+*** Upgrading Haskell packages
+
+All of the customized Haskell packages are under the ~nix/haskell~ directory,
+each file being generated by ~cabal2nix~. Thus, updating these packages is also
+easy: just use ~cabal2nix~ to point them to a new version.
+
+For example, here is how we might upgrade the ~clash-prelude~ package to the
+latest Git version:
+
+#+BEGIN_SRC
+[nix-shell:~/src/clash-playground]$ cd nix/haskell
+[nix-shell:~/src/clash-playground/nix/haskell]$ cabal2nix https://github.com/clash-lang/clash-prelude > clash-prelude.nix
+#+END_SRC
+
+* Join in
+
+Be sure to read the [[https://raw.githubusercontent.com/thoughtpolice/clash-playground/master/CONTRIBUTING.md][contributing guidelines]]. File bugs in the GitHub [[https://github.com/thoughtpolice/clash-playground/issues][issue
+tracker]].
+
+Primary git repository:
+
+  - ~git clone https://github.com/thoughtpolice/clash-playground~
+
+* Authors
+
+See [[https://raw.githubusercontent.com/thoughtpolice/clash-playground/master/AUTHORS.txt][AUTHORS.txt]].
+
+* License
+
+MIT. See [[https://raw.githubusercontent.com/thoughtpolice/clash-playground/master/LICENSE.txt][LICENSE.txt]] for more information.

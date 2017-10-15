@@ -1,0 +1,13 @@
+[options]
+mode prove
+depth 17
+
+[engines]
+smtbmc
+
+[script]
+read_verilog -formal top.v
+prep -top top
+
+[files]
+verilog/Counter/top/top.v
