@@ -6,8 +6,8 @@ depth 17
 smtbmc
 
 [script]
-read_verilog -formal top.v
-prep -top top
+read_verilog -formal counter.v
+prep -top counter
 
 [files]
-verilog/Counter/top/top.v
+verilog/Counter/counter/counter.v

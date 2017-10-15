@@ -16,7 +16,7 @@ module Counter
 import           GHC.Stack     (HasCallStack)
 import           Clash.Prelude
 
-import           TopGen        (makeTopEntity)
+import           TopGen        (makeTopEntityWithName)
 import           Assert        (verifyWithReset)
 
 -- | A counter circuit, that counts from 0 to 15 (inclusive) and then resets
@@ -46,4 +46,4 @@ top
   -> "rst" ::: Reset System 'Synchronous
   -> "out" ::: Signal System (Unsigned 6)
 top clk rst = withClockReset clk rst counter
-$(makeTopEntity 'top) -- auto generate
+$(makeTopEntityWithName 'top "counter") -- auto generate
