@@ -10,6 +10,7 @@
 {-# LANGUAGE ViewPatterns       #-}
 module TopGen
   ( makeTopEntity
+  , makeTopEntityWithName
   ) where
 
 -- base
@@ -58,9 +59,8 @@ getReturnTy :: Type -> Q Type
 getReturnTy (ArrowTy _ b) = getReturnTy b
 getReturnTy b             = return b
 
--- | Automatically create a @'TopEntity'@ for a given @Name@.
-makeTopEntity :: Name -> DecsQ
-makeTopEntity n = reify n >>= \case
+makeTopEntityWithName' :: Name -> Maybe String -> DecsQ
+makeTopEntityWithName' n topName = reify n >>= \case
   VarI nam typ _ -> do
     -- helpers
     let prag t = PragmaD (AnnP (valueAnnotation nam) t)
@@ -98,8 +98,11 @@ makeTopEntity n = reify n >>= \case
       _ -> fail "makeTopEntity: Invalid return type!"
 
     -- Return the annotation
+    let realName = case topName of
+          Just nn -> nn             -- user specified name
+          Nothing -> nameBase nam   -- auto-generated name
     top <- lift $ TopEntity
-                    { t_name   = nameBase nam
+                    { t_name   = realName
                     , t_inputs = ins
                     , t_output = out
                     }
@@ -107,3 +110,22 @@ makeTopEntity n = reify n >>= \case
 
   -- failure case: we weren't provided with the name of a binder
   _ -> fail "makeTopEntity: invalid Name, must be a top-level binding!"
+
+-- | Automatically create a @'TopEntity'@ for a given @'Name'@, using the given
+-- @'String'@ to specify the name of the generated RTL entity.
+--
+-- The function arguments and return values of the function specified by the
+-- given @'Name'@ must be annotated with @'(:::)'@. This annotation provides the
+-- given name of the port.
+makeTopEntityWithName :: Name -> String -> DecsQ
+makeTopEntityWithName nam top = makeTopEntityWithName' nam (Just top)
+
+-- | Automatically create a @'TopEntity'@ for a given @'Name'@. The name of the
+-- generated RTL entity will be the name of the function that has been
+-- specified; e.g. @'makeTopEntity' 'foobar@ will generate a @foobar@ module.
+--
+-- The function arguments and return values of the function specified by the
+-- given @'Name'@ must be annotated with @'(:::)'@. This annotation provides the
+-- given name of the port.
+makeTopEntity :: Name -> DecsQ
+makeTopEntity nam = makeTopEntityWithName' nam Nothing
