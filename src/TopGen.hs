@@ -8,6 +8,9 @@
 {-# LANGUAGE TypeOperators      #-}
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE ViewPatterns       #-}
+
+-- | Tools to automatically generated @'TopEntity'@ annotations for compiled
+-- Clash circuits.
 module TopGen
   ( makeTopEntity
   , makeTopEntityWithName
