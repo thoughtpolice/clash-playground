@@ -44,7 +44,7 @@ let
     ]);
 
   shell = let
-    name = "de10-nano-interactive";
+    name = "clash-playground";
     src  = "./";
 
     # Ordinary, non-overridden packages
