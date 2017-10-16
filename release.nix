@@ -70,7 +70,7 @@ let
     buildInputs = pkgInputs ++ myInputs;
     in nixpkgs.stdenv.mkDerivation { inherit name src buildInputs; };
 
-## ---------------------------------------------------------------------------
+  ## ---------------------------------------------------------------------------
   ## -- Main export for release.nix
 
   self = rec
