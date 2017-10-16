@@ -29,17 +29,6 @@ let
       checkPhase = "${nixpkgs.stdenv.shell} -n $out/bin/suprove";
     };
 
-    yices = nixpkgs.yices.overrideAttrs (old: rec {
-      name    = "yices-${version}";
-      version = "2.5.3";
-      src = nixpkgs.fetchFromGitHub {
-        owner = "sri-csl";
-        repo = "yices2";
-        rev = "2502a30dce7786223e06c1fe12d889871567c100";
-        sha256 = "1sv5zmpydi5clmh99ciwad3jz2s8h9ip0a9acp1gfnbrpq991gbx";
-      };
-    });
-
     symbiyosys = nixpkgs.stdenv.mkDerivation rec {
       name = "symbiyosys-${version}";
       version = "2017.09.01";

@@ -49,7 +49,7 @@ let
 
     # Ordinary, non-overridden packages
     pkgInputs = with nixpkgs;
-      [ z3 cvc4
+      [ z3 cvc4 yices
         yosys arachne-pnr icestorm
 
         verilog ghdl_llvm
@@ -63,7 +63,7 @@ let
 
     # Overridden packages
     myInputs = with fpga;
-      [ yices symbiyosys suprove
+      [ symbiyosys suprove
         haskellEnv
       ];
 
