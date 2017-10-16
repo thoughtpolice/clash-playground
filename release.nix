@@ -49,10 +49,13 @@ let
 
     # Ordinary, non-overridden packages
     pkgInputs = with nixpkgs;
-      [ z3 cvc4 yices boolector
-        yosys arachne-pnr icestorm
+      [ # RTL/Hardware tools
+        symbiyosys yosys
+        arachne-pnr icestorm
 
+        # Test/verification
         verilog ghdl_llvm
+        z3 cvc4 yices boolector avy aiger picosat
 
         # Utilities
         nix-prefetch-git nix-prefetch-hg
@@ -63,7 +66,7 @@ let
 
     # Overridden packages
     myInputs = with fpga;
-      [ symbiyosys suprove
+      [ suprove
         haskellEnv
       ];
 

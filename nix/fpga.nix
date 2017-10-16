@@ -28,28 +28,5 @@ let
 
       checkPhase = "${nixpkgs.stdenv.shell} -n $out/bin/suprove";
     };
-
-    symbiyosys = nixpkgs.stdenv.mkDerivation rec {
-      name = "symbiyosys-${version}";
-      version = "2017.09.01";
-      src = nixpkgs.fetchFromGitHub {
-        owner  = "cliffordwolf";
-        repo   = "symbiyosys";
-        rev    = "68d90a55104c0c681fcb6aa02a26a83ff92367b8";
-        sha256 = "1c2zwd7403r5f3wpjrmvaa1qq9g7cpbzhblbc1nkizgr0wa5fiks";
-      };
-
-      buildPhase = "true";
-      installPhase = ''
-        mkdir -p $out/bin $out/share/yosys/python3/
-        cp sbysrc/sby_*.py $out/share/yosys/python3/
-        cp sbysrc/sby.py $out/bin/sby
-        chmod +x $out/bin/sby
-
-        substituteInPlace $out/bin/sby \
-          --replace "##yosys-sys-path##" \
-                    "sys.path += [p + \"/share/yosys/python3/\" for p in [\"$out\", \"${nixpkgs.pkgs.yosys}\"]]"
-      '';
-    };
   };
 in fpgaTools
