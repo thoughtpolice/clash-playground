@@ -31,6 +31,7 @@ import           Data.Bool             (bool)
 
 import           Lattice
 import           TopGen
+import           Utils
 
 --------------------------------------------------------------------------------
 -- Utilities
@@ -44,20 +45,6 @@ type family Period (a :: Domain) :: Nat where
 -- expected to be applied using @TypeApplications@
 clockPeriod :: forall dom. KnownNat (Period dom) => SNat (Period dom)
 clockPeriod = SNat
-
--- | Mealy machine with an enable line.
-mealyEn
-  :: ( HasClockReset dom gate sync
-     )
-  => (s -> i -> (s, o))
-  -> s
-  -> Signal dom Bool
-  -> Signal dom i
-  -> Signal dom o
-mealyEn f iS en = \i -> let s = regEn iS en s'
-                            (s',o) = unbundle (f <$> s <*> i)
-                        in  o
-{-# INLINEABLE mealyEn #-}
 
 --------------------------------------------------------------------------------
 
