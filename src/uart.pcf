@@ -1,0 +1,5 @@
+set_io CLK     J3
+set_io LED0    B5
+
+# FTDI / UART pins
+set_io UART_TX B12
