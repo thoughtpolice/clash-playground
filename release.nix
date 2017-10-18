@@ -70,8 +70,12 @@ let
         haskellEnv
       ];
 
+    shellHook = with nixpkgs; lib.concatStringsSep "\n"
+      [
+      ];
+
     buildInputs = pkgInputs ++ myInputs;
-    in nixpkgs.stdenv.mkDerivation { inherit name src buildInputs; };
+    in nixpkgs.stdenv.mkDerivation { inherit name src buildInputs shellHook; };
 
   ## ---------------------------------------------------------------------------
   ## -- Main export for release.nix
