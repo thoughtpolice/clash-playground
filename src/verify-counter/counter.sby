@@ -1,9 +1,12 @@
 [options]
 mode prove
 depth 17
+wait on
 
 [engines]
-smtbmc
+smtbmc z3
+smtbmc yices
+smtbmc boolector
 
 [script]
 read_verilog -formal counter.v
