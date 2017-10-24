@@ -174,13 +174,15 @@ top clk =
 
       -- generate the SB_PLL40_CORE entity; the parameters here were are
       -- created by the 'icepll' utility to generate a 60mhz clock from
-      -- the 12mhz oscillator
-      (pllOut, pllStable) = sbPll40 (SSymbol @"SIMPLE") d0 d79 d4 d1 clk fakeRst
+      -- the 12mhz oscillator. we use the @PLLOUTGLOBAL@ port, to use the
+      -- global clock network for routing.
+      (_, global, locked) = sbPll40 (SSymbol @"SIMPLE") d0 d79 d4 d1 clk fakeRst
 
       -- convert the locked port to an async reset and synchronize it to the
       -- output PLL clock
-      rstSync = resetSynchronizer pllOut (unsafeToAsyncReset pllStable)
+      rst = resetSynchronizer global (unsafeToAsyncReset locked)
+
   -- invoke the circuit with the clock and reset line
-  in withClockReset pllOut rstSync circuit
+  in withClockReset global rst circuit
 
 $(makeTopEntityWithName 'top "uart") -- auto generate topentity

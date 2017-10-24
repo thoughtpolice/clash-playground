@@ -10,22 +10,23 @@ sbPll40
   -> SNat filter               -- ARG[4]
   -> Clock inp 'Source         -- ARG[5]
   -> Reset inp 'Asynchronous   -- ARG[6]
-  -> ( Clock out 'Source, Signal out Bool )
+  -> ( Clock coreOut 'Source, Clock globalOut 'Source, Signal coreOut Bool )
 "
     , "templateD" : "// sbPll40 begin
-SB_PLL40_CORE #(
-    .FEEDBACK_PATH(\"~NAME[0]\"),
-    .DIVR(~LIT[1]),
-    .DIVF(~LIT[2]),
-    .DIVQ(~LIT[3]),
-    .FILTER_RANGE(~LIT[4])
-  ) ~GENSYM[sbPll40_inst][6] (
-    .LOCK(~RESULT[0]),
-    .RESETB(~ARG[6]),
-    .BYPASS(1'b0),
-    .REFERENCECLK(~ARG[5]),
-    .PLLOUTCORE(~RESULT[1])
-    );
+SB_PLL40_CORE
+  #( .FEEDBACK_PATH(\"~NAME[0]\")
+   , .DIVR(~LIT[1])
+   , .DIVF(~LIT[2])
+   , .DIVQ(~LIT[3])
+   , .FILTER_RANGE(~LIT[4])
+   ) ~GENSYM[sbPll40_inst][6]
+   ( .LOCK(~RESULT[0])
+   , .RESETB(~ARG[6])
+   , .BYPASS(1'b0)
+   , .REFERENCECLK(~ARG[5])
+   , .PLLOUTCORE(~RESULT[2])
+   , .PLLOUTGLOBAL(~RESULT[1])
+   );
 // sbPll40 end"
     }
   },
