@@ -32,13 +32,24 @@ SB_PLL40_CORE
   },
 
   { "BlackBox"    :
-    { "name"      : "Lattice.sbGlobalBuffer"
-    , "templateD" : "// sbGlobalBuffer begin
+    { "name"      : "Lattice.sbGlobalBuf"
+    , "templateD" : "// sbGlobalBuf begin
 SB_GB ~GENSYM[sbGlobalBuffer_inst][0]
   ( .USER_SIGNAL_TO_GLOBAL_BUFFER(~ARG[0])
   , .GLOBAL_BUFFER_OUTPUT(~RESULT)
   );
-// sbGlobalBuffer end"
+// sbGlobalBuf end"
+    }
+  },
+
+  { "BlackBox"    :
+    { "name"      : "Lattice.sbGlobalBuf#"
+    , "templateD" : "// sbGlobalBuf# begin
+SB_GB ~GENSYM[sbGlobalBuffer_inst][0]
+  ( .USER_SIGNAL_TO_GLOBAL_BUFFER(~ARG[0])
+  , .GLOBAL_BUFFER_OUTPUT(~RESULT)
+  );
+// sbGlobalBuf# end"
     }
   },
 

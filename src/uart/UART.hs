@@ -179,8 +179,9 @@ top clk =
       (_, global, locked) = sbPll40 (SSymbol @"SIMPLE") d0 d79 d4 d1 clk fakeRst
 
       -- convert the locked port to an async reset and synchronize it to the
-      -- output PLL clock
-      rst = resetSynchronizer global (unsafeToAsyncReset locked)
+      -- output PLL clock. buffer the PLL signal through the global routing
+      -- network.
+      rst = resetSynchronizer (sbGlobalBuf global) (unsafeToAsyncReset locked)
 
   -- invoke the circuit with the clock and reset line
   in withClockReset global rst circuit
