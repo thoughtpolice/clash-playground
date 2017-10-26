@@ -168,22 +168,6 @@ top
      , "LED0"    ::: Signal Clk60 Bit
      )
 top clk =
-  let -- ICE40 boards typically have no reset button. They also use active-low
-      -- reset, so we pulse a constant async reset to emulate one for the PLL
-      fakeRst = unsafeToAsyncReset (pure True)
-
-      -- generate the SB_PLL40_CORE entity; the parameters here were are
-      -- created by the 'icepll' utility to generate a 60mhz clock from
-      -- the 12mhz oscillator. we use the @PLLOUTGLOBAL@ port, to use the
-      -- global clock network for routing.
-      (_, global, locked) = sbPll40 (SSymbol @"SIMPLE") d0 d79 d4 d1 clk fakeRst
-
-      -- convert the locked port to an async reset and synchronize it to the
-      -- output PLL clock. buffer the PLL signal through the global routing
-      -- network.
-      rst = resetSynchronizer (sbGlobalBuf global) (unsafeToAsyncReset locked)
-
-  -- invoke the circuit with the clock and reset line
-  in withClockReset global rst circuit
-
+  let (clk, rst) = ice40Top clk (pure True) -- fake reset signal
+  in withClockReset clk rst circuit
 $(makeTopEntityWithName 'top "uart") -- auto generate topentity

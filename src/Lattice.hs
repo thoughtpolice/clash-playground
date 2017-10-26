@@ -1,14 +1,15 @@
 {-# OPTIONS_GHC -Wall #-}
 
-{-# LANGUAGE BinaryLiterals  #-}
-{-# LANGUAGE DataKinds       #-}
-{-# LANGUAGE GADTs           #-}
-{-# LANGUAGE InstanceSigs    #-}
-{-# LANGUAGE MagicHash       #-}
-{-# LANGUAGE RankNTypes      #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies    #-}
-{-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE BinaryLiterals   #-}
+{-# LANGUAGE DataKinds        #-}
+{-# LANGUAGE GADTs            #-}
+{-# LANGUAGE InstanceSigs     #-}
+{-# LANGUAGE MagicHash        #-}
+{-# LANGUAGE RankNTypes       #-}
+{-# LANGUAGE TemplateHaskell  #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies     #-}
+{-# LANGUAGE TypeOperators    #-}
 
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise       #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Extra.Solver    #-}
@@ -81,9 +82,24 @@
 --     about the chip or implementation of the synthesis tools.
 --
 module Lattice
-  ( -- ** PLL Primitives
+  (
+    -- * High level utilities
+    -- | These functions offer higher level interfaces, or useful compositions
+    -- of iCE40 primitives.
+
+    -- ** @'TopEntity'@ utilities
+    ice40Top
+
+    -- ** Combinational logic utilities
+  , sbLut4Carry
+
+    -- * Primitive functions
+    -- | These functions map almost directly onto iCE40 tech library primitives,
+    -- and offer slightly nicer/more type-safe interfaces, in some cases.
+
+    -- ** PLL Primitives
     -- $plls
-    sbPll40
+  , sbPll40
 
     -- ** Global Buffer Primitives
     -- $globalbufs
@@ -99,7 +115,7 @@ module Lattice
     -- $combinational
 
     -- *** @'Signal'@ primitives
-  , sbLut4, sbCarry, sbLut4Carry
+  , sbLut4, sbCarry
     -- *** Pure primitives
   , sbLut4#, sbCarry#
 
@@ -120,6 +136,7 @@ import           Clash.Class.BitPack         (BitPack(..))
 import           Clash.NamedTypes            ((:::))
 import           Clash.XException            (errorX)
 
+import           Clash.Explicit.Signal       (resetSynchronizer)
 import           Clash.Prelude.BitIndex      ((!), slice)
 import           Clash.Promoted.Nat          (SNat(..), snatToNum)
 import           Clash.Promoted.Nat.Literals
@@ -220,15 +237,50 @@ sbPll40
 
   -> ( "PLLOUTCORE"   ::: Clock coreOut 'Source
      , "PLLOUTGLOBAL" ::: Clock globalOut 'Source
-     , "RST"          ::: Signal coreOut Bool
+     , "LOCKED"       ::: Signal coreOut Bool
      )
-  -- ^ Output @'Clock'@ signals as well as the resulting @'Reset' signal.
+  -- ^ Output @'Clock'@ signals as well as the resulting @'Reset'@ signal.
 
-sbPll40 _ _ _ _ _ clk (Async rst) = ( unsafeCoerce (clockGate clk rst)
-                                    , unsafeCoerce (clockGate clk rst)
-                                    , unsafeCoerce rst
-                                    )
+sbPll40 _ _ _ _ _ clk (Async rst)
+  = ( unsafeCoerce (clockGate clk rst)
+    , unsafeCoerce (clockGate clk rst)
+    , unsafeCoerce rst
+    )
 {-# NOINLINE sbPll40 #-}
+
+ice40Top
+  :: "REFERENCECLK" ::: Clock dom 'Source
+  -> "REFERENCERST" ::: Signal dom Bool
+  -> ( "CLK" ::: Clock dom 'Source
+     , "RST" ::: Reset dom 'Asynchronous
+     )
+ice40Top inClk inRst =
+  let -- convert the input reset signal to an async reset
+      rst' = unsafeToAsyncReset inRst
+
+      -- generate the PLL clock via the 'sbPll40' primitive; the parameters here
+      -- were created by the 'icepll' utility to generate a 60mhz clock from the
+      -- 12mhz oscillator. we use the @PLLOUTGLOBAL@ port of the PLL output to
+      -- drive the circuit
+      (_, globalClk, locked)
+        = sbPll40 (SSymbol @"SIMPLE") d0 d79 d4 d1 inClk rst'
+
+      -- buffer the PLLOUTGLOBAL clock through one of the iCE40 global buffers.
+      -- PLLOUTGLOBAL clocks have optimized connections to the on-board global
+      -- buffers (GBUF4/GBUF5), so this gives us the 'best' low skew clock we
+      -- can get
+      outClk = sbGlobalBuf globalClk
+
+      -- convert the locked output port, signifying when the PLL clock frequency
+      -- is locked, to a reset signal. this locked port is tied to the input reset
+      -- signal for resets.
+      lockedRst = unsafeToAsyncReset locked
+
+      -- synchronize the reset to the buffered clock, to give our final,
+      -- proper Reset line.
+      outRst = resetSynchronizer outClk lockedRst
+  in (outClk, outRst)
+
 
 --------------------------------------------------------------------------------
 -- Global Buffers
@@ -434,17 +486,39 @@ synthesis.
 -- resources at once.
 sbLut4Carry
   :: forall n dom.
-     ( n <= (2^16)-1
+     ( KnownNat n
+     , n <= (2^16)-1
      )
   => "LUT_INIT" ::: SNat n
+  -- ^ LUT initializer value. This value determines the initial value of the LUT
+  -- resource, which is used when performing lookups.
+  --
+  -- This value is constant and must be determined fully at compile time; it is
+  -- limited to @2^16-1@ bits, as a LUT may only take a 16 bit initializer value
+  -- (a 4-LUT corresponds to @2^4@ = 16 positions to select from.)
+
   -> "IO"       ::: Signal dom Bit
+  -- ^ Input #0. Directly fed to attached LUT.
+
   -> "I1"       ::: Signal dom Bit
+  -- ^ Input #1. Directly fed to attached LUT, and also routed directly to input
+  -- @I0@ of the given LUTs carry unit.
+
   -> "I2"       ::: Signal dom Bit
+  -- ^ Input #2. Directly fed to attached LUT, and also routed directly to input
+  -- @I1@ of the given LUTs carry unit.
+
   -> "I3"       ::: Signal dom Bit
+  -- ^ Input #3. Directly fed to attached LUT.
+
   -> "CI"       ::: Signal dom Bit
+  -- ^ Carry chain input.
+
   -> ( "O"  ::: Signal dom Bit
      , "CO" ::: Signal dom Bit
      )
+  -- ^ Results, including the output value of the LUT, as well as the output
+  -- value of the carry chain.
 sbLut4Carry s@SNat i0 i1 i2 i3 ci = (o, co)
   where
     o  = sbLut4 s i0 i1 i2 i3 -- LUT4 out
@@ -455,25 +529,50 @@ sbLut4Carry s@SNat i0 i1 i2 i3 ci = (o, co)
 -- This function is effectively @'sbLut4#'@, but lifted to @'Signal'@ values.
 sbLut4
   :: forall n dom.
-     ( n <= (2^16)-1
+     ( KnownNat n
+     , n <= (2^16)-1
      )
   => "LUT_INIT" ::: SNat n
-  -> "IO"       ::: Signal dom Bit
-  -> "I1"       ::: Signal dom Bit
-  -> "I2"       ::: Signal dom Bit
-  -> "I3"       ::: Signal dom Bit
-  -> "O"        ::: Signal dom Bit
-sbLut4 s@SNat i0 i1 i2 i3 =
-  sbLut4# s <$> i0 <*> i1 <*> i2 <*> i3
+  -- ^ LUT initializer value. This value determines the initial value of the LUT
+  -- resource, which is used when performing lookups.
+  --
+  -- This value is constant and must be determined fully at compile time; it is
+  -- limited to @2^16-1@ bits, as a LUT may only take a 16 bit initializer value
+  -- (a 4-LUT corresponds to @2^4@ = 16 positions to select from.)
+
+  -> "IO" ::: Signal dom Bit
+  -- ^ Input #0. Directly fed to attached LUT.
+
+  -> "I1" ::: Signal dom Bit
+  -- ^ Input #1. Directly fed to attached LUT, and also routed directly to input
+  -- @I0@ of the given LUTs carry unit.
+
+  -> "I2" ::: Signal dom Bit
+  -- ^ Input #2. Directly fed to attached LUT, and also routed directly to input
+  -- @I1@ of the given LUTs carry unit.
+
+  -> "I3" ::: Signal dom Bit
+  -- ^ Input #3. Directly fed to attached LUT.
+
+  -> "O" ::: Signal dom Bit
+  -- ^ Output of the LUT unit, i.e. "The value of the @n@-th bit of the
+  -- @LUT_INIT@ bitvector, where @n@ is calculated by the lookup table, given
+  -- @IO-I3@"
+
+sbLut4 s@SNat i0 i1 i2 i3 = sbLut4# s <$> i0 <*> i1 <*> i2 <*> i3
 {-# INLINEABLE sbLut4 #-}
 
 -- | Mapping to an @SB_CARRY@ primitive: fast carry logic with global chain.
 -- This function is effectively @'sbCarry4#'@, but lifted to @'Signal'@ values.
 sbCarry
   :: "I0" ::: Signal dom Bit
+  -- ^ Input #0, fed directly to the carry unit.
   -> "I1" ::: Signal dom Bit
+  -- ^ Input #1, fed directly to the carry unit.
   -> "CI" ::: Signal dom Bit
+  -- ^ Carry chain input.
   -> "C0" ::: Signal dom Bit
+  -- ^ Carry chain output.
 sbCarry i0 i1 ci = sbCarry# <$> i0 <*> i1 <*> ci
 {-# INLINEABLE sbCarry #-}
 
@@ -578,6 +677,6 @@ TODO FIXME: Not implemented here!
 
 -- | Specialized @'BitVector'@ index operator with a specialized @'Index'@ type
 -- to avoid \"default inferred type\" warnings.
-(!.) :: BitVector 2 -> Index 2 -> Bit
-(!.) = (!) -- specialize index type
+(!.) :: forall n. KnownNat n => BitVector n -> Index n -> Bit
+(!.) = (!)
 {-# INLINE (!.) #-}
