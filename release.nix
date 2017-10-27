@@ -58,7 +58,7 @@ let
         z3 cvc4 yices boolector avy aiger picosat
 
         # Utilities
-        nix-prefetch-git nix-prefetch-hg
+        nix-prefetch-git nix-prefetch-hg nix-repl
         cabal-install cabal2nix
 
         silver-searcher
