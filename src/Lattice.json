@@ -61,7 +61,7 @@ SB_WARMBOOT ~GENSYM[sbWarmBoot_inst][0]
   , .S1(~ARG[1])
   , .S0(~ARG[2])
   );
-assign ~RESULT = 1'd0;
+assign ~RESULT = ~ARG[3];
 // sbWarmBoot# end"
     }
   },

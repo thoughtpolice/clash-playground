@@ -1,6 +1,5 @@
-module Utils
-  ( mealyEn
-  ) where
+-- | Useful Clash utilities.
+module Utils where
 
 import           Clash.Prelude
 
@@ -17,3 +16,18 @@ mealyEn f iS en = \i -> let s = regEn iS en s'
                             (s',o) = unbundle (f <$> s <*> i)
                         in  o
 {-# INLINEABLE mealyEn #-}
+
+(&) :: a -> (a -> b) -> b
+(&) = flip ($)
+
+(<&>) :: Applicative f => f a -> (a -> b) -> f b
+(<&>) = flip (<$>)
+
+(.^.) :: (Bits a, Applicative f) => f a -> f a -> f a
+(.^.) = liftA2 xor
+
+notA :: (KnownNat a, KnownNat b, Functor f) => f (BitVector a) -> f (BitVector b)
+notA = fmap $ \x -> resize (complement (reduceOr x))
+
+zero :: KnownNat n => BitVector n
+zero = 0

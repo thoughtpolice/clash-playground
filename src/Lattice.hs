@@ -136,7 +136,7 @@ import           Clash.Class.BitPack         (BitPack(..))
 import           Clash.NamedTypes            ((:::))
 import           Clash.XException            (errorX)
 
-import           Clash.Explicit.Signal       (resetSynchronizer)
+import           Clash.Explicit.Signal
 import           Clash.Prelude.BitIndex      ((!), slice)
 import           Clash.Promoted.Nat          (SNat(..), snatToNum)
 import           Clash.Promoted.Nat.Literals
@@ -422,21 +422,25 @@ instance BitPack WarmBootImage where
 -- /Note: Warm Boot mode is different from Cold Boot, executed during initial/
 -- /device boot-up sequence./
 sbWarmBoot
-  :: ( BitPack a, BitSize a ~ 2
+  :: ( BitPack addr, BitSize addr ~ 2
      ) =>
      "BOOT" ::: Signal dom Bit
   -- ^ Triggering @'Signal'@, used to initiate boot transfer. This @'Signal'@ is
   -- purely level sensitive.
 
-  -> "ADDR" ::: Signal dom a
+  -> "ADDR" ::: Signal dom addr
   -- ^ Two bit address, specifying which of the 4 pre-defined configuration
   -- images present in the iCE40 bitstream to transfer control to. This type
   -- may be any @'BitPack'@-able type of size two. A useful type that is
   -- easy to read for this purpose is @'WarmBootImage'@.
 
-  -> Signal dom ()
-  -- ^ Nullary @'Signal'@ result.
-sbWarmBoot boot addr = sbWarmBoot# boot (fmap (!. 1) v) (fmap (!. 0) v)
+  -> r
+  -- ^ Return value. This is simply returned without any modification from the
+  -- Haskell function.
+
+  -> r
+  -- ^ Return value.
+sbWarmBoot boot addr r = sbWarmBoot# boot (fmap (!. 1) v) (fmap (!. 0) v) r
   where v = fmap pack addr
 {-# INLINEABLE sbWarmBoot #-}
 
@@ -447,8 +451,9 @@ sbWarmBoot#
   :: "BOOT" ::: Signal dom Bit
   -> "S1"   ::: Signal dom Bit
   -> "S0"   ::: Signal dom Bit
-  -> Signal dom ()
-sbWarmBoot# = \_ _ _ -> pure ()
+  -> r
+  -> r
+sbWarmBoot# = \_ _ _ r -> r
 {-# NOINLINE sbWarmBoot# #-}
 
 --------------------------------------------------------------------------------
