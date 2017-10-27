@@ -1,0 +1,22 @@
+* Multi-boot example for iCE40 IceStick Board
+
+This is a port of the ~icemulti~ example from IceStorm to Clash.
+
+It creates 4 bitstream files and uses the ~icemulti~ tool to package them into a
+single image. The bitstreams each blink for a few seconds, before using the
+~SB_WARMBOOT~ primitive to pass control to the next image.
+
+This example also features a tiny little [[http://shakebuild.com][Shake]] powered build system which will
+package up everything for you and program your board. Simply run:
+
+#+BEGIN_SRC
+$ ./build.hs -j4
+$ ./build.hs program
+#+END_SRC
+
+This will invoke the default target to build a ~./build/config.bin~ image which
+can be programmed to the IceStick board. The ~*.rpt~ files under ~./build/~
+contain synthesis, placement and timing information.
+
+The ~program~ target will ask you to ~sudo~ in order to write the bitstream to
+the device.
