@@ -61,7 +61,7 @@ let
         nix-prefetch-git nix-prefetch-hg nix-repl
         cabal-install cabal2nix
 
-        silver-searcher
+        silver-searcher ripgrep
       ];
 
     # Overridden packages
