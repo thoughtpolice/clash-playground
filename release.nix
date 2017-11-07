@@ -4,7 +4,7 @@ let
   ## ---------------------------------------------------------------------------
   ## -- Nixpkgs configuration
 
-  haskell = import ./nix/haskell.nix { compiler = "ghc821"; };
+  haskell = import ./nix/pkgs/haskell.nix { compiler = "ghc821"; };
   pkgconf =
     { allowUnfree = true;
       inherit (haskell) packageOverrides;
@@ -12,7 +12,12 @@ let
 
   nixpkgs = (import ./nix/nixpkgs.nix) { config = pkgconf; };
 
-  fpga = import ./nix/fpga.nix { inherit nixpkgs; };
+  ## ---------------------------------------------------------------------------
+  ## -- Other non-haskell packages
+
+  fpgaPackages = rec {
+    suprove = import ./nix/pkgs/suprove.nix { inherit nixpkgs; };
+  };
 
   ## ---------------------------------------------------------------------------
   ## -- Shell environment
@@ -65,8 +70,8 @@ let
       ];
 
     # Overridden packages
-    myInputs = with fpga;
-      [ suprove
+    myInputs =
+      [ fpgaPackages.suprove
         haskellEnv
       ];
 

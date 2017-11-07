@@ -28,9 +28,9 @@ in
             generatedOverrides = haskellPackagesNew: haskellPackagesOld:
               let toPackage = file: _: {
                     name  = builtins.replaceStrings [ ".nix" ] [ "" ] file;
-                    value = haskellPackagesNew.callPackage (./. + "/haskell/${file}") { };
+                    value = haskellPackagesNew.callPackage (./. + "/hs/${file}") { };
                   };
-              in pkgs.lib.mapAttrs' toPackage (builtins.readDir ./haskell);
+              in pkgs.lib.mapAttrs' toPackage (builtins.readDir ./hs);
 
             makeOverrides =
               function: names: haskellPackagesNew: haskellPackagesOld:
