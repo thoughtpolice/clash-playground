@@ -10,9 +10,9 @@ mkDerivation {
   pname = "clash-ghc";
   version = "0.99";
   src = fetchgit {
-    url = "https://github.com/clash-lang/clash-compiler";
-    sha256 = "0n9ghriqm9r9lmhx984p0dd3sqnhxg3acfwqd0c1rpwnjjzpak3g";
-    rev = "1877cc0ef906b2eb37ff00e233d005bf5b41136e";
+    url = "https://github.com/clash-lang/clash-compiler.git";
+    sha256 = "0b3jm5a17r8dhxkzq2xk09rcr72x0hk9zggcidn3zigqpcyqdhzz";
+    rev = "f2f9b2fc405354af653bf65f4ac2e38b6c33aa99";
   };
   postUnpack = "sourceRoot+=/clash-ghc; echo source root reset to $sourceRoot";
   isLibrary = true;

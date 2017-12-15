@@ -10,8 +10,8 @@ mkDerivation {
   version = "0.99";
   src = fetchgit {
     url = "https://github.com/clash-lang/clash-prelude.git";
-    sha256 = "0xws6mhwv8ipm5j1awly9am0kyvwagb8hv95i2f52lyq28w4wvkc";
-    rev = "f095469f29b072e88b3b1ce47f857e9f657909b9";
+    sha256 = "0dsd0qwbimlaszwl7khm6272iynp0j7dsr398casf84yxxkgr31l";
+    rev = "db6b8a117f748933e90784e9bfd10f5ef9b29737";
   };
   libraryHaskellDepends = [
     array base bifunctors constraints data-binary-ieee754 data-default

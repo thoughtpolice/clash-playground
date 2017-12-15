@@ -24,10 +24,11 @@ let
 
   haskellEnv = haskell.makeEnv nixpkgs
     (haskellPackages: with haskellPackages; [
+      haskellPackages.ghc
+
       shake
       ghcid
 
-      haskellPackages.ghc
       ghc-mtl
       ghc-boot
       ghc-paths

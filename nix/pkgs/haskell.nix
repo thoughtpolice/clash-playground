@@ -44,7 +44,13 @@ in
               pkgs.lib.fold pkgs.lib.composeExtensions (_: _: {});
 
             # More exotic overrides go here
-            manualOverrides = haskellPackagesNew: haskellPackagesOld: {};
+            manualOverrides = haskellPackagesNew: haskellPackagesOld: {
+              shake      = haskellPackagesOld.shake_0_16;
+
+              # Needed for clash-prelude and clash-compiler
+              th-desugar = haskellPackagesOld.th-desugar_1_7;
+              singletons = haskellPackagesOld.singletons_2_3_1;
+            };
           in
             pkgs.haskell.packages."${compiler}".override {
               overrides = composeExtensionsList [
