@@ -25,7 +25,6 @@ import           Clash.Promoted.Symbol (SSymbol(..))
 
 import           GHC.TypeLits.Extra    (Div)
 
-import           Control.Lens          ((<&>))
 import           Data.Bool             (bool)
 
 import           Lattice

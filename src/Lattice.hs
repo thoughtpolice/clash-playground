@@ -280,7 +280,7 @@ ice40Top inClk inRst =
       -- proper Reset line.
       outRst = resetSynchronizer outClk lockedRst
   in (outClk, outRst)
-
+{-# NOINLINE ice40Top #-}
 
 --------------------------------------------------------------------------------
 -- Global Buffers
@@ -442,7 +442,7 @@ sbWarmBoot
   -- ^ Return value.
 sbWarmBoot boot addr r = sbWarmBoot# boot (fmap (!. 1) v) (fmap (!. 0) v) r
   where v = fmap pack addr
-{-# INLINEABLE sbWarmBoot #-}
+{-# NOINLINE sbWarmBoot #-}
 
 -- | Direct mapping to @SB_WARMBOOT@ for @'sbWarmBoot'@. Defined separately, so
 -- arguments are easier to pass onto the primitive -- by using multiple
