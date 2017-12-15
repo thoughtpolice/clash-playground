@@ -1,4 +1,5 @@
 {
-  "rev": "5fc4f17862883b1f133e69f8e283f96715018c30",
-  "sha256": "14kha6lqyhfki06x9b07zzgm56ppnyfg29nxv8rqzk14zd8yq6vr"
+  "url":    "https://github.com/nixos/nixpkgs/archive/7c19c219bd080627ffb7f91c2e5246bebe779295.tar.gz",
+  "rev":    "7c19c219bd080627ffb7f91c2e5246bebe779295",
+  "sha256": "0gyg3jc29yfzjqgs129dqlr37f5i0rh75ivk82pqxdzkjj90nf2d"
 }

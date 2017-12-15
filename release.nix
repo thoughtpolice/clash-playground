@@ -59,7 +59,7 @@ let
         arachne-pnr icestorm
 
         # Test/verification
-        verilog ghdl_llvm
+        verilog
         z3 cvc4 yices boolector avy aiger picosat
 
         # Utilities
