@@ -35,6 +35,8 @@ development in general:
     - A few SMT solvers including Yices (now GPLv3!) and Z3 (MIT) to go with
       SymbiYosys.
 
+  - *A neat-o binary cache*, so you don't have to compile anything!
+
 ** How to use this repository
 
 #+BEGIN_QUOTE
@@ -65,27 +67,68 @@ $ nix-env --version
 nix-env (Nix) 1.11.14
 #+END_SRC
 
-After this is done, you can...
-
-*** Run ~nix-shell~ and get some coffee
-
-Now, clone the Git repository and simply execute ~nix-shell~ inside the root:
+After this is done, you can clone the Git repository:
 
 #+BEGIN_SRC
 $ git clone https://github.com/thoughtpolice/clash-playground
 $ cd clash-playground
-$ nix-shell
+#+END_SRC
+
+*** Run ~nix-shell~ and get some coffee
+
+At this point, you normally would just run ~nix-shell~, however, this normally
+implies going and hanging out for a while, because you must compile a bunch of
+stuff that may not be in the upstream Nixpkgs repository.
+
+However, I have set up a binary cache for this repository, making it possible to
+streamline the work to a few extra downloads.
+
+**** Binary cache details
+
+The binary cache's public address is https://hydra.inner-haven.net, with a
+public key of ~lVCkRJgfZNjeDvs1k5pSMxV2TLIIUnWaUv1AKx3zTdI=~, *which you should
+verify on the public website before using!*
+
+The convention is to normally specify this as a single string,
+~hydra.inner-haven.net-1:lVCkRJgfZNjeDvs1k5pSMxV2TLIIUnWaUv1AKx3zTdI=~
+
+If you are running on NixOS, or using multi-user NixOS, the best place to do
+this is to put it inside your ~nix.conf~ file (see ~man 5 nix.conf~). *If you
+are not doing that, just skip over this part and go to the next one*. This is
+the following specification I use, which allow me to opt-into my server:
+
+#+BEGIN_SRC
+binary-caches = https://cache.nixos.org
+trusted-binary-caches = https://hydra.inner-haven.net
+
+signed-binary-caches = *
+binary-cache-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.inner-haven.net-1:lVCkRJgfZNjeDvs1k5pSMxV2TLIIUnWaUv1AKx3zTdI=
+
+verify-https-binary-caches = true
+#+END_SRC
+
+**** Run nix-shell
+
+This does not enable the cache by default on your machine, but does enable and
+trust it, so any user may enable it. You can now run `nix-shell` like this:
+
+#+BEGIN_SRC
+$ nix-shell --option binary-caches "https://cache.nixos.org https://hydra.inner-haven.net"
 #+END_SRC
 
 *NOTE*: if you have a bunch of spare cores available, you can speed this up! For
 example, using the ~ncpus~ utility, available in most systems already:
 
 #+BEGIN_SRC
-$ nix-shell -j$(ncpus)
+$ nix-shell -j$(ncpus) --option binary-caches "https://cache.nixos.org https://hydra.inner-haven.net"
 #+END_SRC
 
 This will download in parallel, but it will also compile many things in
 parallel, so use it with as many cores as you can spare to help speed it up.
+
+Now...
+
+*** Play inside the ~nix-shell~
 
 Once this is complete, you will be dropped into a new Bash shell environment,
 with a green ~PS1~ prompt, that looks like the following:
