@@ -52,7 +52,8 @@ let
   shell = let
     name = "clash-playground";
     src  = "./";
-    unpackPhase = ":";
+    unpackPhase  = ":";
+    installPhase = ":";
 
     # Ordinary, non-overridden packages
     pkgInputs = with nixpkgs;
@@ -83,7 +84,7 @@ let
 
     buildInputs = pkgInputs ++ myInputs;
     in nixpkgs.stdenv.mkDerivation {
-      inherit name src buildInputs shellHook unpackPhase;
+      inherit name src buildInputs shellHook unpackPhase installPhase;
     };
 
   ## ---------------------------------------------------------------------------
