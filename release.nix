@@ -82,7 +82,9 @@ let
       ];
 
     buildInputs = pkgInputs ++ myInputs;
-    in nixpkgs.stdenv.mkDerivation { inherit name src buildInputs shellHook; };
+    in nixpkgs.stdenv.mkDerivation {
+      inherit name src buildInputs shellHook unpackPhase;
+    };
 
   ## ---------------------------------------------------------------------------
   ## -- Main export for release.nix
