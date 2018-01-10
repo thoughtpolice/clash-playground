@@ -165,12 +165,23 @@ The two most common things to do are "upgrade Haskell packages" and "upgrade Nix
 
 *** Upgrading nixpkgs
 
-This is easy: simply run ~nix-shell~, then use ~nix-prefetch-git~ to update the
-~nixpkgs.json~ file under the ~nix/~ directory:
+This is easy: simply get the revision you want to update to (from GitHub, ~git
+rev-parse HEAD~ in your local git clone, where-ever) and use the
+~./update-nixpkgs.sh~ script inside ~./nix/~, like so:
 
 #+BEGIN_SRC
-[nix-shell:~/src/clash-playground]$ nix-prefetch-git https://github.com/nixos/nixpkgs.git > nix/nixpkgs.json
+[nix-shell:~/src/clash-playground]$ cd nix
+[nix-shell:~/src/clash-playground/nix]$ ./update-nixpkgs.sh <REVISION>
 #+END_SRC
+
+If you want to point the revision to a custom version of Nixpkgs (e.g. in your
+GitHub) fork, you can do that too:
+
+#+BEGIN_SRC
+[nix-shell:~/src/clash-playground/nix]$ ./update-nixpkgs.sh <REPOSITORY> <REVISION>
+#+END_SRC
+
+This is really just a simple wrapper around ~nix-prefetch-url~.
 
 *** Upgrading Haskell packages
 

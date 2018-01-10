@@ -4,7 +4,7 @@ let
   ## ---------------------------------------------------------------------------
   ## -- Nixpkgs configuration
 
-  haskell = import ./nix/pkgs/haskell.nix { compiler = "ghc821"; };
+  haskell = import ./nix/pkgs/haskell.nix { compiler = "ghc822"; };
   pkgconf =
     { allowUnfree = true;
       inherit (haskell) packageOverrides;

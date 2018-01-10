@@ -3,12 +3,12 @@
 
 let
   dontCheckPackages =
-    [ "ghc-typelits-knownnat"
-      "clash-prelude"
+    [
     ];
 
   doJailbreakPackages =
-    [
+    [ "clash-prelude" # spurious bound restricting ghc-typelits-knownnat >= 0.4
+      "clash-ghc"     # spurious bound on knownnat, bifunctors
     ];
 
   dontHaddockPackages =
@@ -44,13 +44,7 @@ in
               pkgs.lib.fold pkgs.lib.composeExtensions (_: _: {});
 
             # More exotic overrides go here
-            manualOverrides = haskellPackagesNew: haskellPackagesOld: {
-              shake      = haskellPackagesOld.shake_0_16;
-
-              # Needed for clash-prelude and clash-compiler
-              th-desugar = haskellPackagesOld.th-desugar_1_7;
-              singletons = haskellPackagesOld.singletons_2_3_1;
-            };
+            manualOverrides = haskellPackagesNew: haskellPackagesOld: {};
           in
             pkgs.haskell.packages."${compiler}".override {
               overrides = composeExtensionsList [

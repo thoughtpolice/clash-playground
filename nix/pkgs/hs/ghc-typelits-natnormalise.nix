@@ -3,11 +3,11 @@
 }:
 mkDerivation {
   pname = "ghc-typelits-natnormalise";
-  version = "0.5.7";
+  version = "0.5.8";
   src = fetchgit {
     url = "https://github.com/clash-lang/ghc-typelits-natnormalise.git";
-    sha256 = "0czsyvbqy0yjj6dq1bldz40xr8brfcm9ghjprafhvc2s6dv4lm89";
-    rev = "d19727ee5a163a61ffd8edd3c7f4a31519f85ea9";
+    sha256 = "1xxmnh97ax4y1zzahcc1zlr6qljgm03ww2jb3ip7z8bwxnnq00ry";
+    rev = "4a88b2035cc07f18d7ad1cc6e957596f31b6a235";
   };
   libraryHaskellDepends = [
     base ghc ghc-tcplugins-extra integer-gmp
