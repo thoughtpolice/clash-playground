@@ -52,6 +52,7 @@ let
   shell = let
     name = "clash-playground";
     src  = "./";
+    unpackPhase = ":";
 
     # Ordinary, non-overridden packages
     pkgInputs = with nixpkgs;
