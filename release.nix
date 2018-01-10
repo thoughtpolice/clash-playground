@@ -53,7 +53,7 @@ let
     name = "clash-playground";
     src  = "./";
     unpackPhase  = ":";
-    installPhase = ":";
+    installPhase = "touch $out";
 
     # Ordinary, non-overridden packages
     pkgInputs = with nixpkgs;
