@@ -86,11 +86,11 @@ streamline the work to a few extra downloads.
 **** Binary cache details
 
 The binary cache's public address is https://hydra.inner-haven.net, with a
-public key of ~lVCkRJgfZNjeDvs1k5pSMxV2TLIIUnWaUv1AKx3zTdI=~, *which you should
+public key of ~VqumEYPdXW7X7eamcVvvrJaqbCV9LToxKyUPZUv++/A=~, *which you should
 verify on the public website before using!*
 
 The convention is to normally specify this as a single string,
-~hydra.inner-haven.net-1:lVCkRJgfZNjeDvs1k5pSMxV2TLIIUnWaUv1AKx3zTdI=~
+~hydra.inner-haven.net-1:VqumEYPdXW7X7eamcVvvrJaqbCV9LToxKyUPZUv++/A=~
 
 If you are running on NixOS, or using multi-user NixOS, the best place to do
 this is to put it inside your ~nix.conf~ file (see ~man 5 nix.conf~). *If you
@@ -102,7 +102,7 @@ binary-caches = https://cache.nixos.org
 trusted-binary-caches = https://hydra.inner-haven.net
 
 signed-binary-caches = *
-binary-cache-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.inner-haven.net-1:lVCkRJgfZNjeDvs1k5pSMxV2TLIIUnWaUv1AKx3zTdI=
+binary-cache-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.inner-haven.net-1:VqumEYPdXW7X7eamcVvvrJaqbCV9LToxKyUPZUv++/A=
 
 verify-https-binary-caches = true
 #+END_SRC
