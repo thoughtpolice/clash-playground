@@ -1,11 +1,15 @@
-{ config }:
+{ system ? builtins.currentSystem
+, config ? { allowUnfree = true; }
+}:
 
 let
   # Grab the versions we specified in the JSON file
-  nixpkgs   = builtins.fromJSON (builtins.readFile ./nixpkgs.json);
+  nixpkgs = builtins.fromJSON (builtins.readFile ./nixpkgs.json);
 
   # Bootstrap a copy of nixpkgs, based on this.
-  src = import ./fetchnix.nix { inherit (nixpkgs) url rev sha256; };
+  src = builtins.fetchTarball {
+    name = "nixpkgs-${builtins.substring 0 6 nixpkgs.rev}";
+    inherit (nixpkgs) url sha256;
+  };
 
-# We use the default nixpkgs configuration during bootstrap.
-in import src { inherit config; }
+in import src { inherit system config; }

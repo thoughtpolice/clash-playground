@@ -1,25 +1,33 @@
-#!/usr/bin/env bash
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p jq curl
+
+## Utility to automatically update nixpkgs.json quickly and easily from either
+## the Nixpkgs upstream or a custom fork. Runs interactively using `nix-shell`
+## for zero-install footprint.
+
 set -e
 
-if [[ "x$1" == "x" ]]; then
-    echo "Must provide a revision argument"
-    echo "Usage:"
-    echo "  ./update-nixpkgs.sh <rev>"
-    echo "  ./update-nixpkgs.sh https://github.com/foo/nixpkgs <rev>"
-    exit 1
-fi
+API=https://api.github.com/repos
+URL="https://github.com/nixos/nixpkgs"
 
-if [[ "x$2" == "x" ]]; then
-    REV="$1"
-    URL="https://github.com/nixos/nixpkgs"
+if [[ "x$1" == "x" ]]; then
+  echo -n "No revision, so grabbing latest upstream Nixpkgs master commit... "
+  REV=$(curl -s "${API}/nixos/nixpkgs/commits/master" | jq -r '.sha')
+  echo "OK, got ${REV:0:9}"
 else
+  if [[ "x$2" == "x" ]]; then
+    REV="$1"
+    echo "Custom revision (but no repo) provided, using nixpkgs upstream"
+  else
     REV="$2"
     URL="$1"
+    echo "Custom revision in upstream ${URL} will be used"
+  fi
 fi
 
 DOWNLOAD="$URL/archive/$REV.tar.gz"
-echo "Updating to nixpkgs revision $REV from $URL"
-SHA256=$(nix-prefetch-url "$DOWNLOAD")
+echo "Updating to nixpkgs revision ${REV:0:9} from $URL"
+SHA256=$(nix-prefetch-url --unpack "$DOWNLOAD")
 
 cat > nixpkgs.json <<EOF
 {
