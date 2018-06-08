@@ -4,11 +4,11 @@
 }:
 mkDerivation {
   pname = "ghc-typelits-knownnat";
-  version = "0.4";
+  version = "0.5";
   src = fetchgit {
     url = "https://github.com/clash-lang/ghc-typelits-knownnat.git";
-    sha256 = "0qlfizflyz9xadjaib5nckgzbwb8bk07npaqlvz4gwiwzsasq9j5";
-    rev = "4f8c1f833baf6354ea41e9b634e0beed53ab3475";
+    sha256 = "191n5flwmrz3vf7p384kanw6kfvpgbiy77sr3jccfbq4f86g2lsj";
+    rev = "c3a4c99ec8307393887790b9080ecdc8fe4ae51a";
   };
   libraryHaskellDepends = [
     base ghc ghc-tcplugins-extra ghc-typelits-natnormalise

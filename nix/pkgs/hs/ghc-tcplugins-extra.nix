@@ -1,11 +1,11 @@
 { mkDerivation, base, fetchgit, ghc, stdenv }:
 mkDerivation {
   pname = "ghc-tcplugins-extra";
-  version = "0.2.2";
+  version = "0.3";
   src = fetchgit {
     url = "https://github.com/clash-lang/ghc-tcplugins-extra.git";
-    sha256 = "1pvx31gkzj15lfpx68palzfgssli2hiibgqaydq1ny8lb6ia1076";
-    rev = "5acf45e24e15f096a07dea6be0163fb1a465d4fa";
+    sha256 = "1f5c0pixg9vwsq6ym662f74f7pl8s4im4k3ndqgwd10zzkdx4ibr";
+    rev = "4f2defb334da089100a16c8e75ba462b06c9d465";
   };
   libraryHaskellDepends = [ base ghc ];
   homepage = "http://github.com/clash-lang/ghc-tcplugins-extra";

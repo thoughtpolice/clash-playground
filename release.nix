@@ -4,7 +4,7 @@ let
   ## ---------------------------------------------------------------------------
   ## -- Nixpkgs configuration
 
-  haskell = import ./nix/pkgs/haskell.nix { compiler = "ghc822"; };
+  haskell = import ./nix/pkgs/haskell.nix { compiler = "ghc843"; };
   pkgconf =
     { allowUnfree = true;
       inherit (haskell) packageOverrides;
@@ -67,7 +67,7 @@ let
 
         # Utilities
         nix-prefetch-git nix-prefetch-hg nix-repl
-        cabal-install cabal2nix
+        cabal-install
 
         silver-searcher ripgrep
       ];

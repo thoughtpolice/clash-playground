@@ -3,12 +3,11 @@
 
 let
   dontCheckPackages =
-    [
+    [ "clash-prelude" # spurious doctest failures
     ];
 
   doJailbreakPackages =
-    [ "clash-prelude" # spurious bound restricting ghc-typelits-knownnat >= 0.4
-      "clash-ghc"     # spurious bound on knownnat, bifunctors
+    [
     ];
 
   dontHaddockPackages =
