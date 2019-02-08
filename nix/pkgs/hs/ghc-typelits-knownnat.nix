@@ -1,17 +1,18 @@
-{ mkDerivation, base, fetchgit, ghc, ghc-tcplugins-extra
+{ mkDerivation, base, fetchgit, ghc, ghc-prim, ghc-tcplugins-extra
 , ghc-typelits-natnormalise, stdenv, tasty, tasty-hunit
 , tasty-quickcheck, template-haskell, transformers
 }:
 mkDerivation {
   pname = "ghc-typelits-knownnat";
-  version = "0.5";
+  version = "0.6";
   src = fetchgit {
-    url = "https://github.com/clash-lang/ghc-typelits-knownnat.git";
-    sha256 = "191n5flwmrz3vf7p384kanw6kfvpgbiy77sr3jccfbq4f86g2lsj";
-    rev = "c3a4c99ec8307393887790b9080ecdc8fe4ae51a";
+    url = "https://github.com/clash-lang/ghc-typelits-knownnat";
+    sha256 = "1s7xf60f9r2i9xhg9p4prm2qw4rvqag0wx1jsrfzrrx8nm3b53rl";
+    rev = "7c866bdefff3f8353a29eebb3d35264dacb2af28";
+    fetchSubmodules = true;
   };
   libraryHaskellDepends = [
-    base ghc ghc-tcplugins-extra ghc-typelits-natnormalise
+    base ghc ghc-prim ghc-tcplugins-extra ghc-typelits-natnormalise
     template-haskell transformers
   ];
   testHaskellDepends = [

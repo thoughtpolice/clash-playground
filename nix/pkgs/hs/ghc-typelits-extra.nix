@@ -4,11 +4,12 @@
 }:
 mkDerivation {
   pname = "ghc-typelits-extra";
-  version = "0.2.5";
+  version = "0.3";
   src = fetchgit {
-    url = "https://github.com/clash-lang/ghc-typelits-extra.git";
-    sha256 = "0n2rwfrm31bndnl3cg5m9gh0b2ha12nmsv0hrd1681x7aipganim";
-    rev = "21dafece0a166134e4f5a3b1bcbc2fb0f42ab90b";
+    url = "https://github.com/clash-lang/ghc-typelits-extra";
+    sha256 = "159z5k68yiri75zxp0fxb82clna7c57wll2fwwm17vfhba3780hh";
+    rev = "f1cba7cebf73e429dbdfa67c88161300bc5e318e";
+    fetchSubmodules = true;
   };
   libraryHaskellDepends = [
     base ghc ghc-prim ghc-tcplugins-extra ghc-typelits-knownnat
